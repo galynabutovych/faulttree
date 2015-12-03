@@ -7,10 +7,12 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 
 import edu.uci.ics.jung.algorithms.layout.TreeLayout;
 import edu.uci.ics.jung.graph.DelegateForest;
 import edu.uci.ics.jung.graph.Forest;
+import edu.uci.ics.jung.io.GraphMLWriter;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
 import edu.uci.ics.jung.visualization.control.CrossoverScalingControl;
 import edu.uci.ics.jung.visualization.control.DefaultModalGraphMouse;
@@ -29,11 +31,20 @@ import edu.uci.ics.jung.visualization.renderers.Renderer.VertexLabel.Position;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import java.awt.event.ActionListener;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Set;
 import java.awt.event.ActionEvent;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
+
+import org.apache.commons.collections15.Transformer;
+
 import javax.swing.JSeparator;
 
 public class GraphPanel extends JPanel {
@@ -50,6 +61,7 @@ public class GraphPanel extends JPanel {
 	private JPanel panel_3;
 	private JButton btnDoLayout;
 	private JSeparator separator;
+	private JButton btnCalculate;
 
 	/**
 	 * Create the panel.
@@ -87,24 +99,25 @@ public class GraphPanel extends JPanel {
 		panel_3.add(panel);
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-		JLabel lblAddNode = new JLabel("Add Child");
+		JLabel lblAddNode = new JLabel("Додати базисну подію");
 		lblAddNode.setHorizontalAlignment(SwingConstants.CENTER);
 		panel.add(lblAddNode);
 
 		listPrimaryEvents = new JList<PrimaryEvents>();
 		panel.add(listPrimaryEvents);
 
-		JButton btnAdd = new JButton("Add");
+		JButton btnAdd = new JButton("Додати");
 		btnAdd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				System.out.println("clicked");
 				if(listPrimaryEvents.getSelectedIndex() != -1)
 				{
 					PrimaryEvents event = PrimaryEvents.values()[listPrimaryEvents.getSelectedIndex()];
 					if(tree.getVertexCount()==0)
 						// create root
 					{
-						tree.addVertex(new Event(event,"no name"));
+						Event v = new Event(event,"");
+						tree.addVertex(v);
+						vv.repaint();
 					}
 					else
 					{
@@ -113,7 +126,7 @@ public class GraphPanel extends JPanel {
 						if(vertices.size() == 1)
 						{
 							MyVertex source = vertices.iterator().next();
-							Event target = new Event(event,"no name");
+							Event target = new Event(event,"");
 
 							if(source.getClass() == Event.class)
 							{
@@ -148,6 +161,16 @@ public class GraphPanel extends JPanel {
 		separator = new JSeparator();
 		panel_3.add(separator);
 
+		btnCalculate = new JButton("Розрахувати");
+		panel_3.add(btnCalculate);
+		btnCalculate.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				Collection<MyVertex> roots = tree.getRoots();
+				if(!roots.isEmpty())
+				calculateTopProbability(roots.iterator().next());
+			}
+		});
+
 		final CrossoverScalingControl scaler = new CrossoverScalingControl();
 		JButton plus = new JButton("+");
 		plus.addActionListener(new ActionListener() {
@@ -180,6 +203,45 @@ public class GraphPanel extends JPanel {
 		setGraph(tree);
 	}
 
+	double calculateTopProbability(MyVertex v)
+	{
+		double probability = 0;
+		if(v.getClass() == Event.class)
+			probability = ((Event)v).getProbability();
+		else if(v.getClass() == Gate.class)
+			{
+				switch (((Gate)v).getGate()) {
+				case AND:
+					probability = 1;
+					break;
+				case OR:
+					probability = 0;
+					break;
+				}
+			}
+		Iterator<Integer> i = tree.getChildEdges(v).iterator();
+		while (i.hasNext()) {
+			double p = calculateTopProbability(tree.getOpposite(v,i.next()));
+			if(v.getClass() == Gate.class)
+			{
+				switch (((Gate)v).getGate()) {
+				case AND:
+					probability = probability * p;
+					break;
+				case OR:
+					probability = probability + p;
+					break;
+				}
+			}
+			else
+				probability = p;
+		}
+		if(v.getClass() == Event.class)
+			((Event)v).setProbability(probability);
+		return probability;
+		
+	}
+
 	public void setGraph(DelegateForest<MyVertex, Integer> g) {
 		TreeLayout<MyVertex,Integer> layout = new TreeLayout<MyVertex,Integer>((Forest<MyVertex,Integer>)g);
 
@@ -191,7 +253,7 @@ public class GraphPanel extends JPanel {
 		vv.getRenderer().getVertexLabelRenderer().setPosition(Position.CNTR);
 		vv.getRenderContext().setEdgeShapeTransformer(
 				new EdgeShape.Line<MyVertex,Integer>());
-		vv.setForeground(Color.magenta);
+		vv.setForeground(Color.blue);
 		vv.setBackground(Color.white);
 		DefaultModalGraphMouse graphMouse = new DefaultModalGraphMouse();
 		//		EditingModalGraphMouse<MyVertex, Integer> graphMouse = new EditingModalGraphMouse<MyVertex, Integer>(vv.getRenderContext(), 
@@ -202,17 +264,21 @@ public class GraphPanel extends JPanel {
 		graphMouse.add(myPlugin);
 		vv.setGraphMouse(graphMouse);
 
-		vv.getRenderContext().setEdgeDrawPaintTransformer(new PickableEdgePaintTransformer<Integer>(this.vv.getPickedEdgeState(), Color.black, Color.cyan));
-		vv.getRenderContext().setVertexLabelRenderer(new DefaultVertexLabelRenderer(Color.cyan));
-		vv.getRenderContext().setEdgeLabelRenderer(new DefaultEdgeLabelRenderer(Color.cyan));
+		vv.getRenderContext().setEdgeDrawPaintTransformer(new PickableEdgePaintTransformer<Integer>(this.vv.getPickedEdgeState(), Color.black, Color.red));
+		vv.getRenderContext().setVertexLabelRenderer(new DefaultVertexLabelRenderer(Color.red));
+		vv.getRenderContext().setEdgeLabelRenderer(new DefaultEdgeLabelRenderer(Color.red));
 		vv.setVertexToolTipTransformer(new ToStringLabeller<MyVertex>());
 		vv.setEdgeToolTipTransformer(new ToStringLabeller<Integer>());
+		vv.setVertexToolTipTransformer(new ToStringLabeller<MyVertex>(){
+			public String transform(MyVertex v) {
+				return v.getToolTip();
+			}
+		});
 
 		PickableVertexPaintTransformer<MyVertex> vpf = 
 				new PickableVertexPaintTransformer<MyVertex>(vv.getPickedVertexState(), Color.red, Color.yellow);
 		vv.getRenderContext().setEdgeDrawPaintTransformer(new PickableEdgePaintTransformer<Integer>(vv.getPickedEdgeState(), Color.black, Color.cyan));
 		vv.getRenderContext().setVertexFillPaintTransformer(vpf);
-
 
 		IconVertexIconTransformer<MyVertex> vertexIconFunction = new IconVertexIconTransformer<MyVertex>();
 		VertexIconShapeTransformer<MyVertex> vertexIconShapeFunction = new CustomVertexIconShapeTransformer<MyVertex>();
@@ -226,5 +292,25 @@ public class GraphPanel extends JPanel {
 		graph.setLayout(new BoxLayout(graph, BoxLayout.X_AXIS));
 
 		graph.add(vv);
+	}
+	
+	void saveAs()
+	{
+		GraphMLWriter<MyVertex, Integer> graphWriter = new GraphMLWriter<MyVertex, Integer>();
+		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setDialogTitle("Specify a file to save");    
+
+		int userSelection = fileChooser.showSaveDialog(this);
+
+		if (userSelection == JFileChooser.APPROVE_OPTION) {
+		    File fileToSave = fileChooser.getSelectedFile();
+		    try {
+				PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(fileToSave.getAbsoluteFile())));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		    System.out.println("Save as file: " + fileToSave.getAbsolutePath());
+		}
 	}
 }

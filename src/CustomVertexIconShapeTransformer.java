@@ -21,8 +21,8 @@ public class CustomVertexIconShapeTransformer<V> extends VertexIconShapeTransfor
 			switch (((Event)v).getEvent()) {
 			case BASIC_EVENT:
 				return transformIcon(IconVertexIconTransformer.getBasic_event());
-			case CONDITIONING_EVENT:
-				return transformIcon(IconVertexIconTransformer.getConditioning_event());
+//			case CONDITIONING_EVENT:
+//				return transformIcon(IconVertexIconTransformer.getConditioning_event());
 			case EXTERNAL_EVENT:
 				return transformIcon(IconVertexIconTransformer.getExternal_event());
 			case INTERMEDIATE_EVENT:
@@ -39,12 +39,12 @@ public class CustomVertexIconShapeTransformer<V> extends VertexIconShapeTransfor
 				return transformIcon(IconVertexIconTransformer.getAnd_gate());
 			case OR:
 				return transformIcon(IconVertexIconTransformer.getOr_gate());
-			case XOR:
-				return transformIcon(IconVertexIconTransformer.getXor_gate());
-			case PRIORITY_AND:
-				return transformIcon(IconVertexIconTransformer.getPriority_and_gate());
-			case INHIBIT:
-				return transformIcon(IconVertexIconTransformer.getInhibit_gate());
+//			case XOR:
+//				return transformIcon(IconVertexIconTransformer.getXor_gate());
+//			case PRIORITY_AND:
+//				return transformIcon(IconVertexIconTransformer.getPriority_and_gate());
+//			case INHIBIT:
+//				return transformIcon(IconVertexIconTransformer.getInhibit_gate());
 			default:
 				return null;
 			}

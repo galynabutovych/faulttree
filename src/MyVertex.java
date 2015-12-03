@@ -1,6 +1,6 @@
 public class MyVertex {
 	private static int IDCOUNTER = 0;
-    protected final String name;
+    protected String name;
     private final int id;
 
     MyVertex(String name)
@@ -8,28 +8,24 @@ public class MyVertex {
         this.name = name;
         this.id = IDCOUNTER++;
     }
-
-    String getName()
+    String getToolTip()
     {
-        return name;
+    	return null;
     }
-
     @Override
     public String toString()
     {
         return name;
     }
-
-    @Override
-    public int hashCode()
-    {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + id;
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
-        return result;
-    }
-
+//    @Override
+//    public int hashCode()
+//    {
+//        final int prime = 31;
+//        int result = 1;
+//        result = prime * result + id;
+//        result = prime * result + ((name == null) ? 0 : name.hashCode());
+//        return result;
+//    }
     @Override
     public boolean equals(Object obj)
     {
@@ -41,13 +37,6 @@ public class MyVertex {
             return false;
         MyVertex other = (MyVertex) obj;
         if (id != other.id)
-            return false;
-        if (name == null)
-        {
-            if (other.name != null)
-                return false;
-        }
-        else if (!name.equals(other.name))
             return false;
         return true;
     }

@@ -25,8 +25,8 @@ public class IconVertexIconTransformer<V> extends DefaultVertexIconTransformer<V
 			switch (((Event)v).getEvent()) {
 			case BASIC_EVENT:
 				return getBasic_event();
-			case CONDITIONING_EVENT:
-				return getConditioning_event();
+//			case CONDITIONING_EVENT:
+//				return getConditioning_event();
 			case EXTERNAL_EVENT:
 				return getExternal_event();
 			case INTERMEDIATE_EVENT:
@@ -43,12 +43,12 @@ public class IconVertexIconTransformer<V> extends DefaultVertexIconTransformer<V
 				return getAnd_gate();
 			case OR:
 				return getOr_gate();
-			case XOR:
-				return getXor_gate();
-			case PRIORITY_AND:
-				return getPriority_and_gate();
-			case INHIBIT:
-				return getInhibit_gate();
+//			case XOR:
+//				return getXor_gate();
+//			case PRIORITY_AND:
+//				return getPriority_and_gate();
+//			case INHIBIT:
+//				return getInhibit_gate();
 			default:
 				return null;
 			}
