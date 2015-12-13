@@ -5,9 +5,18 @@ public class Gate extends MyVertex {
     {
         super(name);
     }
+	Gate(int id, String name)
+    {
+        super(id,name);
+    }
 	Gate(Gates gate, String name)
     {
         super(name);
+        this.gate = gate;
+    }
+	Gate(int id, Gates gate, String name)
+    {
+        super(id,name);
         this.gate = gate;
     }
 	public Gates getGate() {

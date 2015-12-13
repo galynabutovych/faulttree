@@ -1,5 +1,7 @@
 import edu.uci.ics.jung.algorithms.layout.GraphElementAccessor;
 import edu.uci.ics.jung.algorithms.layout.TreeLayout;
+import edu.uci.ics.jung.graph.DelegateTree;
+import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import edu.uci.ics.jung.graph.Forest;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.visualization.VisualizationViewer;
@@ -106,13 +108,23 @@ public class PopupVertexEdgeMenuMousePlugin<V, E> extends AbstractPopupGraphMous
 		return deleteVertex;
 	}
 
+	private void remove (DelegateTree<V, E> t, V v)
+	{
+		if(t.getChildCount(v) > 0)
+			while(t.getChildCount(v) != 0) {
+				t.removeVertex(t.getChildren(v).iterator().next());
+			}
+		t.removeVertex(v);
+	}
+
 	private JMenuItem createDeleteVertex(V v, VisualizationViewer<V, E> vv, Graph<V, E> g) {
 		JMenuItem deleteVertex = new JMenuItem("Видалити");
 		AbstractAction deleteAction = new AbstractAction("Видалити") {
 			private static final long serialVersionUID = 5410126442976698368L;
 
 			public void actionPerformed(ActionEvent e) {
-				g.removeVertex(v);
+				DelegateTree<V,E> td = ((DelegateTree<V, E>)g);
+				remove(td, v);
 				vv.repaint();
 			}
 		};
