@@ -401,7 +401,7 @@ public class GraphPanel extends JPanel {
 	void loadGraph()
 	{
 		JFileChooser fileChooser = new JFileChooser();
-		fileChooser.addChoosableFileFilter(new FileNameExtensionFilter(".graphml", "graph ml"));
+		fileChooser.addChoosableFileFilter(new FileNameExtensionFilter("GraphML Files", "graphml"));
 		fileChooser.setDialogTitle("Specify a file to open");
 
 		if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
