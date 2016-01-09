@@ -89,7 +89,11 @@ public class FaultTreeWindow {
 		JMenuItem menuItemOpen = new JMenuItem("Відкрити");
 		menu.add(menuItemOpen);
 		menuItemOpen.setIcon(new ImageIcon(FaultTreeWindow.class.getResource("/resources/icons/open.png")));
-		
+		menuItemOpen.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				graphPanel.loadGraph();
+			}
+		});
 		
 		JMenu mnNewMenu = new JMenu("Інструкція");
 		menuBar.add(mnNewMenu);

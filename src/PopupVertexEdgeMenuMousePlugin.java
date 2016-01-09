@@ -110,10 +110,9 @@ public class PopupVertexEdgeMenuMousePlugin<V, E> extends AbstractPopupGraphMous
 
 	private void remove (DelegateTree<V, E> t, V v)
 	{
-		if(t.getChildCount(v) > 0)
-			while(t.getChildCount(v) != 0) {
-				t.removeVertex(t.getChildren(v).iterator().next());
-			}
+		while(t.getChildCount(v) != 0) {
+			remove(t,t.getChildren(v).iterator().next());
+		}
 		t.removeVertex(v);
 	}
 
