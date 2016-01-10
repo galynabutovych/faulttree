@@ -3,6 +3,8 @@ import javax.swing.ListSelectionModel;
 
 import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.List;
+
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JButton;
@@ -19,6 +21,7 @@ import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import edu.uci.ics.jung.graph.Forest;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.UndirectedSparseGraph;
+import edu.uci.ics.jung.graph.util.Pair;
 import edu.uci.ics.jung.io.GraphIOException;
 import edu.uci.ics.jung.io.GraphMLMetadata;
 import edu.uci.ics.jung.io.GraphMLWriter;
@@ -49,22 +52,29 @@ import javax.swing.Icon;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.Console;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.invoke.ConstantCallSite;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.awt.event.ActionEvent;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.vecmath.Tuple2d;
 
+import org.apache.commons.collections15.MapUtils;
 import org.apache.commons.collections15.Transformer;
 
 import javax.swing.JSeparator;
@@ -171,7 +181,6 @@ public class GraphPanel extends JPanel {
 			}
 		});
 		panel.add(btnAdd);
-
 		listPrimaryEvents.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		separator = new JSeparator();
@@ -204,7 +213,6 @@ public class GraphPanel extends JPanel {
 		scaleGrid.add(minus);
 
 		createGraph();
-
 		populatePrimaryEvents();
 	}
 
@@ -216,7 +224,7 @@ public class GraphPanel extends JPanel {
 		tree = new DirectedSparseGraph<MyVertex, Integer>();
 		setGraph(tree);
 	}
-	
+
 	double calculateTopProbability(MyVertex v) {
 		double probability = 0;
 		if (v.getClass() == Event.class)
@@ -249,7 +257,100 @@ public class GraphPanel extends JPanel {
 		if (v.getClass() == Event.class)
 			((Event) v).setProbability(probability);
 		return probability;
+	}
 
+	java.util.List<String> getUniqueLeafVertexNames()
+	{
+		java.util.List<String> list = new ArrayList<String>();
+		for(MyVertex v: tree.getVertices())
+		{
+			if(v.getClass() == Event.class)
+			{
+				if(!list.contains(v.name))
+				{
+					if(tree.outDegree(v) == 0)
+						list.add(v.name);
+				}
+			}
+		}
+		return list;
+	}
+
+	boolean calculateBooleanFunction(Map<String,Boolean> argValues)
+	{
+		MyVertex root = Helper.getRoot(tree);
+		return calculateBooleanFunctionOnVertex(argValues,root);
+	}
+	boolean calculateBooleanFunctionOnVertex(Map<String,Boolean> argValues, MyVertex v)
+	{
+		boolean result = false;
+		if (v.getClass() == Event.class)
+		{
+			if(tree.outDegree(v)>0)
+				return calculateBooleanFunctionOnVertex(argValues,tree.getSuccessors(v).iterator().next());
+			else
+				result = argValues.get(v.name);
+		}
+		else if (v.getClass() == Gate.class) {
+			switch (((Gate) v).getGate()) {
+			case AND:
+				result = true;
+				break;
+			case OR:
+				result = false;
+				break;
+			}
+		}
+		Iterator<Integer> i = tree.getOutEdges(v).iterator();
+		while (i.hasNext()) {
+			boolean p = calculateBooleanFunctionOnVertex(argValues,tree.getOpposite(v, i.next()));
+			if (v.getClass() == Gate.class) {
+				switch (((Gate) v).getGate()) {
+				case AND:
+					result = result && p;
+					break;
+				case OR:
+					result = result || p;
+					break;
+				}
+			} else
+				result = p;
+		}
+		return result;
+	}
+	void calculateBooleanFunctionTable()
+	{
+		java.util.List<String> argNames = getUniqueLeafVertexNames();
+		int argCount = argNames.size();
+		if(argCount > Integer.BYTES*8)
+		{
+			//not supported (32 arguments maximum)
+		}
+		Integer argValuesMask = 0;
+
+		int maxColumns = 1 << argCount;
+		//2^argCount rows in a table
+		for(int i = 0; i < maxColumns; ++i)
+		{
+			Map<String,Boolean> argValues = new Hashtable<String,Boolean>(argCount);
+			int argMask = 1;
+			for(String n: argNames)
+			{
+				argValues.put(n, ((argValuesMask & argMask) != 0));
+				argMask <<= 1;
+				System.out.print(n);
+				System.out.print(" = ");
+				System.out.print(argValues.get(n));
+				System.out.print(',');
+			}
+			argValuesMask += 1;
+			boolean result = calculateBooleanFunction(argValues);
+			System.out.print("  RESULT = ");
+			System.out.print(result);
+			System.out.println();
+			//			System.out.println(argValues);
+		}
+		System.out.println(argNames);
 	}
 
 	public void setGraph(DirectedSparseGraph<MyVertex, Integer> g) {
@@ -259,7 +360,6 @@ public class GraphPanel extends JPanel {
 		g.addVertex(root);
 		td.setRoot(root);
 		TreeLayout<MyVertex,Integer> layout = new TreeLayout<MyVertex,Integer>(td);
-		
 
 		graph.setBackground(Color.LIGHT_GRAY);
 
@@ -398,6 +498,7 @@ public class GraphPanel extends JPanel {
 			System.out.println("Save as file: " + fileToSave.getAbsolutePath());
 		}
 	}
+
 	void loadGraph()
 	{
 		JFileChooser fileChooser = new JFileChooser();
@@ -453,26 +554,26 @@ public class GraphPanel extends JPanel {
 					return e;
 				}
 			};
-			
+
 			Transformer<HyperEdgeMetadata, Integer> hyperEdgeTransformer = new Transformer<HyperEdgeMetadata, Integer>() {
-			    public Integer transform(HyperEdgeMetadata metadata) {
-			        Integer e = MyEdgeFactory.getInstance().create();
-			        return e;
-			    }
+				public Integer transform(HyperEdgeMetadata metadata) {
+					Integer e = MyEdgeFactory.getInstance().create();
+					return e;
+				}
 			};
-			
+
 			Transformer<GraphMetadata, DirectedSparseGraph<MyVertex, Integer>> gTransformer = new Transformer<GraphMetadata, DirectedSparseGraph<MyVertex, Integer>>() {
-			    public DirectedSparseGraph<MyVertex, Integer> transform(GraphMetadata metadata) {
-			        if (metadata.getEdgeDefault().equals(metadata.getEdgeDefault().DIRECTED)) {
-			            return new DirectedSparseGraph<MyVertex, Integer>();
-			        } else {
-			            return null;
-			        }
-			    }
+				public DirectedSparseGraph<MyVertex, Integer> transform(GraphMetadata metadata) {
+					if (metadata.getEdgeDefault().equals(metadata.getEdgeDefault().DIRECTED)) {
+						return new DirectedSparseGraph<MyVertex, Integer>();
+					} else {
+						return null;
+					}
+				}
 			};
 
 			GraphMLReader2<DirectedSparseGraph<MyVertex, Integer>, MyVertex, Integer> graphReader = new GraphMLReader2<DirectedSparseGraph<MyVertex, Integer>, MyVertex, Integer>(fileReader, gTransformer, vertexTransformer, 
-edgeTransformer,hyperEdgeTransformer);
+					edgeTransformer,hyperEdgeTransformer);
 
 			try {
 				/* Get the new graph object from the GraphML file */
@@ -485,5 +586,6 @@ edgeTransformer,hyperEdgeTransformer);
 				vv.repaint();
 			} catch (GraphIOException ex) {}
 		}
+		calculateBooleanFunctionTable();
 	}
 }

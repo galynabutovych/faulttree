@@ -55,7 +55,7 @@ public class FaultTreeWindow {
 	 */
 	private void initialize() {
 		frmFaultTree = new JFrame();
-		frmFaultTree.setTitle("Дерево відмов");
+		frmFaultTree.setTitle("Topaz");
 		frmFaultTree.setBounds(100, 100, 822, 639);
 		frmFaultTree.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		

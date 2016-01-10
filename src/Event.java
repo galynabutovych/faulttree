@@ -16,8 +16,6 @@ public class Event extends MyVertex {
 	
 	final private static Map<String, String> descriptionsByName = new HashMap<String, String>();
 	final private static Map<String, Double> probabilitiesByName = new HashMap<String,Double>();
-	final private static Map<String, Double> eventTypesByName = new HashMap<String,Double>();
-	final private static MultiMap<String, Integer> idsByName = new MultiHashMap<>();
 	
 	Event(String name)
     {
@@ -76,7 +74,5 @@ public class Event extends MyVertex {
 	{
 		descriptionsByName.clear();
 		probabilitiesByName.clear();
-		eventTypesByName.clear();
-		idsByName.clear();
 	}
 }

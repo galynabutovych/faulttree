@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns/graphml"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  
+xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns/graphml">
+<key id="subtype" for="node">
+<desc>type of vertex</desc>
+<default></default>
+</key>
+<key id="probability" for="node">
+<default>0</default>
+</key>
+<key id="name" for="node">
+<desc>name of vertex, not nessesary unique</desc>
+<default></default>
+</key>
+<key id="x" for="node">
+<default>0</default>
+</key>
+<key id="description" for="node">
+<default></default>
+</key>
+<key id="y" for="node">
+<default>0</default>
+</key>
+<key id="type" for="node">
+<desc>type of vertex</desc>
+<default></default>
+</key>
+<graph edgedefault="directed">
+<node id="8">
+<data key="subtype">BASIC_EVENT</data>
+<data key="probability">0.2</data>
+<data key="name">x</data>
+<data key="x">143.0</data>
+<data key="description">kcencencnc</data>
+<data key="y">267.0</data>
+<data key="type">Event</data>
+</node>
+<node id="9">
+<data key="subtype">BASIC_EVENT</data>
+<data key="probability">0.2</data>
+<data key="name">x</data>
+<data key="x">195.0</data>
+<data key="description">kcencencnc</data>
+<data key="y">363.0</data>
+<data key="type">Event</data>
+</node>
+<node id="11">
+<data key="subtype">BASIC_EVENT</data>
+<data key="probability">0.1</data>
+<data key="name">y</data>
+<data key="x">238.0</data>
+<data key="description"></data>
+<data key="y">363.0</data>
+<data key="type">Event</data>
+</node>
+<node id="4">
+<data key="subtype">INTERMEDIATE_EVENT</data>
+<data key="probability">0.012000000000000004</data>
+<data key="name">block1</data>
+<data key="x">218.0</data>
+<data key="description"></data>
+<data key="y">167.0</data>
+<data key="type">Event</data>
+</node>
+<node id="3">
+<data key="subtype">BASIC_EVENT</data>
+<data key="probability">0.9</data>
+<data key="name">z</data>
+<data key="x">343.0</data>
+<data key="description"></data>
+<data key="y">167.0</data>
+<data key="type">Event</data>
+</node>
+<node id="0">
+<data key="subtype">INTERMEDIATE_EVENT</data>
+<data key="probability">0.009720000000000005</data>
+<data key="name">root</data>
+<data key="x">268.0</data>
+<data key="description"></data>
+<data key="y">67.0</data>
+<data key="type">Event</data>
+</node>
+<node id="5">
+<data key="subtype">INTERMEDIATE_EVENT</data>
+<data key="probability">0.30000000000000004</data>
+<data key="name">block2</data>
+<data key="x">218.0</data>
+<data key="description"></data>
+<data key="y">267.0</data>
+<data key="type">Event</data>
+</node>
+<node id="1">
+<data key="subtype">BASIC_EVENT</data>
+<data key="probability">0.9</data>
+<data key="name">v</data>
+<data key="x">393.0</data>
+<data key="description"></data>
+<data key="y">167.0</data>
+<data key="type">Event</data>
+</node>
+<node id="2">
+<data key="subtype">AND</data>
+<data key="probability">0</data>
+<data key="name"></data>
+<data key="x">268.0</data>
+<data key="description"></data>
+<data key="y">117.0</data>
+<data key="type">Gate</data>
+</node>
+<node id="7">
+<data key="subtype">BASIC_EVENT</data>
+<data key="probability">0.2</data>
+<data key="name">x</data>
+<data key="x">293.0</data>
+<data key="description">kcencencnc</data>
+<data key="y">267.0</data>
+<data key="type">Event</data>
+</node>
+<node id="10">
+<data key="subtype">OR</data>
+<data key="probability">0</data>
+<data key="name"></data>
+<data key="x">218.0</data>
+<data key="description"></data>
+<data key="y">317.0</data>
+<data key="type">Gate</data>
+</node>
+<node id="6">
+<data key="subtype">AND</data>
+<data key="probability">0</data>
+<data key="name"></data>
+<data key="x">218.0</data>
+<data key="description"></data>
+<data key="y">217.0</data>
+<data key="type">Gate</data>
+</node>
+<edge source="0" target="2"/>
+<edge source="2" target="1"/>
+<edge source="2" target="3"/>
+<edge source="2" target="4"/>
+<edge source="4" target="6"/>
+<edge source="6" target="5"/>
+<edge source="6" target="7"/>
+<edge source="6" target="8"/>
+<edge source="5" target="10"/>
+<edge source="10" target="9"/>
+<edge source="10" target="11"/>
+</graph>
+</graphml>
